@@ -29,7 +29,21 @@ module.exports = {
       .query(
         `SELECT * FROM cc_appointments
       WHERE approved = false
-      ORDER BY date DESC`
+      ORDER BY date DESC;`
+      )
+      .then((dbRes) => res.status(200).send(dbRes[0]))
+      .catch((err) => console.log(err));
+  },
+  getUpcomingAppointments: (req, res) => {
+    sequelize
+      .query(
+        `select a.appt_id, a.date, a.service_type, a.approved, a.completed, u.first_name, u.last_name 
+    from cc_appointments a
+    join cc_emp_appts ea on a.appt_id = ea.appt_id
+    join cc_employees e on e.emp_id = ea.emp_id
+    join cc_users u on e.user_id = u.user_id
+    where a.approved = true and a.completed = false
+    order by a.date desc;`
       )
       .then((dbRes) => res.status(200).send(dbRes[0]))
       .catch((err) => console.log(err));
@@ -38,28 +52,13 @@ module.exports = {
   getPastAppointments: (req, res) => {
     sequelize
       .query(
-        `SELECT a.appt_id, a.date, a.service_type, notes, u.first_name, u.last_name
+        `SELECT a.appt_id, a.date, a.service_type, a.notes, u.first_name, u.last_name
     FROM cc_appointments a
-    JOIN cc_emp_appts ea on a.appt_id = ea.appt_id
-    JOIN cc_employees e on e.emp_id = ea.emp_id
-    JOIN cc_users u on e.user_id = u.user.id
+    JOIN cc_emp_appts ea ON a.appt_id = ea.appt_id
+    JOIN cc_employees e ON e.emp_id = ea.emp_id
+    JOIN cc_users u ON e.user_id = u.user_id
     WHERE a.approved = true and a.completed = true
-    ORDER BY a.date DESC`
-      )
-      .then((dbRes) => res.status(200).send(dbRes[0]))
-      .catch((err) => console.log(err));
-  },
-
-  getUpcomingAppointments: (req, res) => {
-    sequelize
-      .query(
-        `SELECT a.appt_id, a.date, a.service_type, a.approved, a.completed, u.first_name, u.last_name 
-        FROM cc_appointments a
-        JOIN cc_emp_appts ea ON a.appt_id = ea.appt_id
-        JOIN cc_employees e ON e.emp_id = ea.emp_id
-        JOIN cc_users u ON e.user_id = u.user_id
-        WHERE a.approved = true and a.completed = false
-        ORDER BY a.date desc;`
+    ORDER BY a.date DESC;`
       )
       .then((dbRes) => res.status(200).send(dbRes[0]))
       .catch((err) => console.log(err));
