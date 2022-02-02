@@ -14,6 +14,27 @@ const sequelize = new Sequelize(CONNECTION_STRING, {
 let nextEmp = 5;
 
 module.exports = {
+  getAllClients: (req, res) => {
+    sequelize
+      .query(
+        `SELECT * FROM cc_clients c
+    JOIN cc_users u ON c.user_id = u.user_id;`
+      )
+      .then((dbRes) => res.status(200).send(dbRes[0]))
+      .catch((err) => console.log(err));
+  },
+
+  getPendingAppointments: (req, res) => {
+    sequelize
+      .query(
+        `SELECT * FROM cc_appointments
+      WHERE approved = false
+      ORDER BY date desc`
+      )
+      .then((dbRes) => res.status(200).send(dbRes[0]))
+      .catch((err) => console.log(err));
+  },
+
   getUpcomingAppointments: (req, res) => {
     sequelize
       .query(
